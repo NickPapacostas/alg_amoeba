@@ -28,6 +28,9 @@ defmodule AmoebaFightShow.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:heap, "~> 1.0.1"}]
+    [
+      {:heap, "~> 1.0.1"},
+      {:benchfella, "~> 0.3.0"}
+    ]
   end
 end

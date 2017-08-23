@@ -1,29 +1,43 @@
 defmodule AmoebaFightShow do
-  def fight(amoebas, time \\ 0)
-  def fight([one_big_amoeba], time), do: %{total: one_big_amoeba, time: time}
-  def fight(amoebas, time) do
-    {pair, new_amoebas} = choose_pair(amoebas)
-    fight(new_amoebas, time + Enum.min(pair))
+  def fight(amoebas, choosing_func, time \\ 0)
+  def fight([one_big_amoeba], _choosing_func, time), do: %{total: one_big_amoeba, time: time}
+  def fight(amoebas, choosing_func, time) do
+    {pair, new_amoebas} = choosing_func.(amoebas)
+    fight(new_amoebas, choosing_func, time + Enum.min(pair))
   end
 
-  def better_fight(amoebas, time \\ 0)
-  def better_fight([one_big_amoeba], time), do: %{total: one_big_amoeba, time: time}
-  def better_fight(amoebas, time) do
-    {pair, new_amoebas} = better_choose_pair(amoebas)
-    better_fight(new_amoebas, time + Enum.min(pair))
+  def heap_min(amoebas) do
+    {max_val, max_index} = amoebas 
+      |> Enum.with_index 
+      |> Enum.into(Heap.min)
+      |> Heap.root
+
+    fight_smallest_neighbor(amoebas, max_val, max_index)
   end
 
-  def choose_pair([first, second | rest]) do
+  def heap_max(amoebas) do
+    {max_val, max_index} = amoebas 
+      |> Enum.with_index 
+      |> Enum.into(Heap.max)
+      |> Heap.root
+
+    fight_smallest_neighbor(amoebas, max_val, max_index)
+  end
+
+  def basic_choose_pair([first, second | rest]) do
     {[first, second], [first + second | rest]}
   end
 
-  def better_choose_pair(amoebas) do
+  def biggest_first(amoebas) do
     {max_val, max_index} = 
       amoebas
       |> Enum.with_index 
       |> Enum.max_by(fn({v, _i}) -> v end)
 
+    fight_smallest_neighbor(amoebas, max_val, max_index)
+  end
 
+  def fight_smallest_neighbor(amoebas, max_val, max_index) do
     if max_index == 0 do
       {[max_val, Enum.at(amoebas, 1)], [max_val + Enum.at(amoebas, 1) | Enum.slice(amoebas, 2..-1)]}
     else
